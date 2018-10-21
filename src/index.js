@@ -15,8 +15,8 @@ let paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth) / 2; // starting position on the x-axis;
 let rightPressed = false;
 let leftPressed = false;
-const brickRowCount = 3;
-const brickColumnCount = 5;
+const brickRowCount = 5;
+const brickColumnCount = 3;
 const brickWidth = 75;
 const brickHeight = 20;
 const brickPadding = 10;
@@ -27,7 +27,7 @@ let bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0 };
+        bricks[c][r] = { x: 0, y: 0, status: 1 };
         //[c] is an array, but also an element index, [r] is an object, but also an element index
     }
 }
@@ -37,39 +37,6 @@ document.addEventListener("keyup", keyUpHandler, false);
 
 // CLEANING UP OUR CODE: to do this, we've moved the ball-drawing portion out of draw()
 // and moved it into its own function drawBall()
-
-function drawBall() {
-    // draw the ball;
-    ctx.beginPath();
-    ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = "#0095dd";
-    ctx.fill();
-    ctx.closePath();
-}
-function drawPaddle() {
-    ctx.beginPath();
-    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-    ctx.fillStyle = "red";
-    //"#0095dd";
-    ctx.fill();
-    ctx.closePath();
-}
-
-function drawBricks() {
-    for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowCount; r++) {
-            let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-            let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
-        }
-    }
-}
 
 function keyDownHandler(e) {
     if (e.keyCode === 39) {
@@ -87,6 +54,56 @@ function keyUpHandler(e) {
     }
 }
 
+function collisionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            let b = bricks[c][r];
+            if (b.status == 1) {
+                if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                }
+            }
+        }
+    }
+}
+
+function drawBall() {
+    // draw the ball;
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = "#0095dd";
+    ctx.fill();
+    ctx.closePath();
+}
+function drawPaddle() {
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+    ctx.fillStyle = "#0095dd";
+    //"#0095dd";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawBricks() {
+    // understand this: the reasoning behind each equation brickX, brickY
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            if (bricks[c][r].status == 1) {
+                let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
+                let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+    }
+}
+
 function draw() {
     // drawPaddle();
     // clear the previous frame to make the ball appear to be moving;
@@ -94,6 +111,7 @@ function draw() {
     drawBricks();
     drawBall(); // moved the original ball-drawing code out from here;);
     drawPaddle();
+    collisionDetection();
 
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
         dx = -dx;
@@ -121,5 +139,6 @@ function draw() {
     y += dy;
 }
 
-setInterval(draw, 10); // due to the infinite nature of setInterval(), the draw function will be called
+setInterval(draw, 50); // due to the infinite nature of setInterval(), the draw function will be called
 // every 10 milliseconds forecer, or until we stop it;
+console.log(bricks);
