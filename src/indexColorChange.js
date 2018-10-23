@@ -70,3 +70,4 @@ function drawBall(color) {
     ctx.fill();
     ctx.closePath();
 }
+

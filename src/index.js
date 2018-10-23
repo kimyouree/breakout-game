@@ -158,6 +158,7 @@ function draw() {
                 dx = 2;
                 dy = -2;
                 paddleX = (canvas.width - paddleWidth) / 2;
+                console.log(lives);
             }
         }
     }
@@ -170,9 +171,10 @@ function draw() {
 
     x += dx;
     y += dy;
+    requestAnimationFrame(draw);
 }
 
-setInterval(draw, 30); // due to the infinite nature of setInterval(), the draw function will be called
+// setInterval(draw, 10); // due to the infinite nature of setInterval(), the draw function will be called
 // every 10 milliseconds forecer, or until we stop it;
-//draw();
+draw();
 console.log(bricks);
