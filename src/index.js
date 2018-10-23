@@ -22,6 +22,7 @@ const brickHeight = 20;
 const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
+let score = 0;
 
 let bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
@@ -59,13 +60,25 @@ function collisionDetection() {
         for (let r = 0; r < brickRowCount; r++) {
             let b = bricks[c][r];
             if (b.status == 1) {
+                // if there is a collision:
                 if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-                    dy = -dy;
-                    b.status = 0;
+                    dy = -dy; // bounce/reverse direction
+                    b.status = 0; // update status to '0'
+                    score++;
+                    if (score == brickRowCount * brickColumnCount) {
+                        alert("YOU WIN, CONGRATULATIONS");
+                        document.location.reload();
+                    }
                 }
             }
         }
     }
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: " + score, 8, 20);
 }
 
 function drawBall() {
@@ -90,10 +103,12 @@ function drawBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
             if (bricks[c][r].status == 1) {
+                // first part: update x & y coordinate
                 let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
                 let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
                 bricks[c][r].x = brickX;
                 bricks[c][r].y = brickY;
+                // draws each blue brick on the canvas per frame
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
                 ctx.fillStyle = "#0095DD";
@@ -111,6 +126,7 @@ function draw() {
     drawBricks();
     drawBall(); // moved the original ball-drawing code out from here;);
     drawPaddle();
+    drawScore();
     collisionDetection();
 
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
@@ -139,6 +155,7 @@ function draw() {
     y += dy;
 }
 
-setInterval(draw, 50); // due to the infinite nature of setInterval(), the draw function will be called
+setInterval(draw, 30); // due to the infinite nature of setInterval(), the draw function will be called
 // every 10 milliseconds forecer, or until we stop it;
+//draw();
 console.log(bricks);
