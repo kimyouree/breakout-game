@@ -171,7 +171,7 @@ function draw() {
 
     x += dx;
     y += dy;
-    requestAnimationFrame(draw);
+    requestAnimationFrame(draw); // syncs the framerate and renders shapes only when needed. smoother animation loop than setInterval
 }
 
 // setInterval(draw, 10); // due to the infinite nature of setInterval(), the draw function will be called
